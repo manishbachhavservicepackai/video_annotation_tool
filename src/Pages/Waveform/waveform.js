@@ -8,10 +8,17 @@ import CursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor";
 
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import TextField from '@mui/material/TextField';
+import Slider from '@mui/material/Slider';
+import Stack from '@mui/material/Stack';
 import { Button } from "@mui/material";
 import client from "../../api/client";
+import { Store } from "react-notifications-component";
+import 'react-notifications-component/dist/theme.css';
+import 'animate.css';
 
 const Waveform = () => {
 
@@ -26,7 +33,6 @@ const Waveform = () => {
     const [file, setFile] = useState(null);
     const [dataFromUpload, setDataFromUpload] = useState({});
     const [agentName, setAgentName] = useState("");
-    const [notify, setNotify] = useState("")
 
     const uploadFileApi = async () => {
         await client({
@@ -94,11 +100,12 @@ const Waveform = () => {
             waveSurferRef.current = waveSurfer;
         })
 
-        console.log(waveSurfer.addRegion({
+        waveSurfer.addRegion({
+            id: "my_id",
             start: 0,
             end: 0.5000,
             color: 'hsla(152, 73%, 84%, 0.5)'
-        }))
+        })
 
         waveSurfer.on("region-updated", function (region) {
             setStartTime((region.start)?.toFixed(4));
@@ -127,6 +134,32 @@ const Waveform = () => {
             }
         }).then((res) => {
             console.log("res from submit", res.data)
+            if (res.data.content.error === false) {
+                Store.addNotification({
+                    title: 'Success',
+                    message: 'Files were synced',
+                    type: 'success',                         // 'default', 'success', 'info', 'warning'
+                    container: 'top-right',                // where to position the notifications
+                    animationIn: ["animated", "fadeIn"],     // animate.css classes that's applied
+                    animationOut: ["animated", "fadeOut"],   // animate.css classes that's applied
+                    dismiss: {
+                        duration: 2000
+                    }
+                })
+            }
+            else {
+                Store.addNotification({
+                    title: 'Error',
+                    message: 'Something went wrong!',
+                    type: 'error',                         // 'default', 'success', 'info', 'warning'
+                    container: 'top-right',                // where to position the notifications
+                    animationIn: ["animated", "fadeIn"],     // animate.css classes that's applied
+                    animationOut: ["animated", "fadeOut"],   // animate.css classes that's applied
+                    dismiss: {
+                        duration: 2000
+                    }
+                })
+            }
         })
     }
     // console.log("start time", startTime);
@@ -175,6 +208,57 @@ const Waveform = () => {
                         onChange={(e) => setAgentName({ ...agentName, agent_name: e.target.value })}
                     />
                 </div>
+
+                <section
+                    className="wave_toggle"
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                        paddingTop: "24px",
+                        paddingBottom: "24px",
+                        paddingInline: "12px",
+                        backgroundColor: "#fff",
+                    }}
+                >
+                    <Button
+                        onClick={() => {
+                            waveSurferRef.current.playPause()
+                            toggleIsPlaying(waveSurferRef.current.isPlaying())
+                        }
+                        }
+                        variant="contained"
+                        sx={{
+                            width: "200px",
+                            fontSize: "14px"
+                        }}
+                        startIcon={isPlaying ? <PauseIcon /> : < PlayArrowIcon />}
+                    >
+                        {isPlaying ? "Pause Full Audio" : "Play Full Audio"}
+                    </Button>
+                    <div
+                        className="slider_div"
+                        style={{
+                            width: "20%",
+                        }}
+                    >
+                        <Stack spacing={2} direction="row" sx={{ mb: 1 }} alignItems="center">
+                            <ZoomOutIcon />
+                            <Slider
+                                aria-label="Zoom"
+                                defaultValue={0}
+                                valueLabelDisplay="auto"
+                                min={0}
+                                max={400}
+                                onChange={(e) => {
+                                    waveSurferRef.current.zoom(e.target.value)
+                                }}
+                            />
+                            <ZoomInIcon />
+                        </Stack>
+
+                    </div>
+                </section>
                 <div
                     ref={containerRef}
                     style={{
@@ -197,18 +281,18 @@ const Waveform = () => {
                 >
                     <Button
                         onClick={() => {
-                            waveSurferRef.current.playPause()
-                            toggleIsPlaying(waveSurferRef.current.isPlaying())
+                            waveSurferRef.current.regions.list["my_id"].play()
+                            // toggleIsPlaying(waveSurferRef.current.isPlaying())
                         }
                         }
                         variant="contained"
                         sx={{
-                            width: "200px",
+                            width: "275px",
                             fontSize: "14px"
                         }}
-                        startIcon={isPlaying ? <PauseIcon /> : < PlayArrowIcon />}
+                        startIcon={< PlayArrowIcon />}
                     >
-                        {isPlaying ? "Pause Full Audio" : "Play Full Audio"}
+                        Play Selected Chunck
                     </Button>
                 </div>
 
@@ -236,8 +320,6 @@ const Waveform = () => {
                     >
                         Submit
                     </Button>
-
-                    <div /* style={{ display: displayErr }} */>{/* {notify} */}</div>
                 </div>
 
             </section>
