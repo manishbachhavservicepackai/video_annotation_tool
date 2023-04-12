@@ -41,7 +41,10 @@ const Waveform = () => {
 
     const handleSpeedChange = (event) => {
         setSpeed(event.target.value);
-        waveSurferRef.current.setPlaybackRate(event.target.value)
+        if (file) {
+            waveSurferRef.current.setPlaybackRate(event.target.value)
+        }
+
     };
 
     const uploadFileApi = async () => {
@@ -147,7 +150,7 @@ const Waveform = () => {
             if (res.data.content.error === false) {
                 Store.addNotification({
                     title: 'Success',
-                    message: 'Files were synced',
+                    message: 'Saved Successfully!',
                     type: 'success',                         // 'default', 'success', 'info', 'warning'
                     container: 'top-right',                // where to position the notifications
                     animationIn: ["animated", "fadeIn"],     // animate.css classes that's applied
@@ -205,6 +208,7 @@ const Waveform = () => {
                     >
                         <label for="file-upload" className="custom-file-upload">
                             Click here to choose
+                            &nbsp;
                             <input id="file-upload" type="file" onChange={onFileChange} />
                         </label>
                     </div>
@@ -212,7 +216,7 @@ const Waveform = () => {
 
                     <TextField
                         id="outlined-basic"
-                        label="Enter your name"
+                        label="Enter name"
                         variant="outlined"
                         size="small"
                         onChange={(e) => setAgentName({ ...agentName, agent_name: e.target.value })}
@@ -233,8 +237,11 @@ const Waveform = () => {
                 >
                     <Button
                         onClick={() => {
-                            waveSurferRef.current.playPause()
-                            toggleIsPlaying(waveSurferRef.current.isPlaying())
+                            if (file) {
+                                waveSurferRef.current.playPause()
+                                toggleIsPlaying(waveSurferRef.current.isPlaying())
+                            }
+
                         }
                         }
                         variant="contained"
@@ -249,7 +256,7 @@ const Waveform = () => {
 
                     <FormControl
                         sx={{
-                            width:"200px"
+                            width: "200px"
                         }}
                         size="small"
                     >
@@ -284,7 +291,9 @@ const Waveform = () => {
                                 min={0}
                                 max={400}
                                 onChange={(e) => {
-                                    waveSurferRef.current.zoom(e.target.value)
+                                    if (file) {
+                                        waveSurferRef.current.zoom(e.target.value)
+                                    }
                                 }}
                             />
                             <ZoomInIcon />
@@ -314,8 +323,9 @@ const Waveform = () => {
                 >
                     <Button
                         onClick={() => {
-                            waveSurferRef.current.regions.list["my_id"].play()
-                            // toggleIsPlaying(waveSurferRef.current.isPlaying())
+                            if (file) {
+                                waveSurferRef.current.regions.list["my_id"].play()
+                            }
                         }
                         }
                         variant="contained"
