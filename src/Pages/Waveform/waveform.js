@@ -14,6 +14,10 @@ import IosShareIcon from '@mui/icons-material/IosShare';
 import TextField from '@mui/material/TextField';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 import { Button } from "@mui/material";
 import client from "../../api/client";
 import { Store } from "react-notifications-component";
@@ -33,6 +37,12 @@ const Waveform = () => {
     const [file, setFile] = useState(null);
     const [dataFromUpload, setDataFromUpload] = useState({});
     const [agentName, setAgentName] = useState("");
+    const [speed, setSpeed] = useState('');
+
+    const handleSpeedChange = (event) => {
+        setSpeed(event.target.value);
+        waveSurferRef.current.setPlaybackRate(event.target.value)
+    };
 
     const uploadFileApi = async () => {
         await client({
@@ -236,6 +246,29 @@ const Waveform = () => {
                     >
                         {isPlaying ? "Pause Full Audio" : "Play Full Audio"}
                     </Button>
+
+                    <FormControl
+                        sx={{
+                            width:"200px"
+                        }}
+                        size="small"
+                    >
+                        <InputLabel id="demo-simple-select-label">Audio Speed</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={speed}
+                            label="Audio Speed"
+                            onChange={handleSpeedChange}
+                        >
+                            <MenuItem value={0.1}>0.3x</MenuItem>
+                            <MenuItem value={0.2}>0.2x</MenuItem>
+                            <MenuItem value={0.3}>0.1x</MenuItem>
+                            <MenuItem value={1}>1x</MenuItem>
+                            <MenuItem value={2}>2x</MenuItem>
+                            <MenuItem value={3}>3x</MenuItem>
+                        </Select>
+                    </FormControl>
                     <div
                         className="slider_div"
                         style={{
