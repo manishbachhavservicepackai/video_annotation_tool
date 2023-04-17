@@ -59,7 +59,7 @@ const Waveform = () => {
                 file: file
             }
         }).then((res) => {
-            setDataFromUpload(res.data?.content)
+            setDataFromUpload(res.data)
         })
     }
 
@@ -126,11 +126,11 @@ const Waveform = () => {
             setEndTime((region.end)?.toFixed(4))
         })
 
-        waveSurfer.on("finish", ()=>{
+        waveSurfer.on("finish", () => {
             setFinished(true)
         })
 
-        waveSurfer.on("play", ()=>{
+        waveSurfer.on("play", () => {
             setFinished(false)
         })
 
@@ -184,8 +184,18 @@ const Waveform = () => {
             }
         })
     }
-    // console.log("start time", startTime);
-    // console.log("endTime", endTime);
+
+    const handleMergeChuncks = async()=>{
+        await client({
+            url: "/merger/",
+            method: "POST",
+        }).then((res) => {
+            console.log(res.data)
+        })
+    }
+
+    console.log(dataFromUpload)
+
 
     return (
         <>
@@ -285,6 +295,21 @@ const Waveform = () => {
                             <MenuItem value={3}>3x</MenuItem>
                         </Select>
                     </FormControl>
+
+                    <Button
+                        onClick={handleMergeChuncks}
+                        variant="contained"
+                        sx={{
+                            width: "250px",
+                            fontSize: "14px",
+                            backgroundColor:"#ef9536",
+                            "&:hover": {
+                                backgroundColor: "#f4801e"
+                            }
+                        }}
+                    >
+                        Merge Chunks
+                    </Button>
                     <div
                         className="slider_div"
                         style={{
@@ -346,6 +371,7 @@ const Waveform = () => {
                     >
                         Play Selected Chunck
                     </Button>
+
                 </div>
 
                 <div
