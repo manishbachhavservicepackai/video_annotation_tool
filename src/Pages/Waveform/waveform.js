@@ -38,6 +38,7 @@ const Waveform = () => {
     const [dataFromUpload, setDataFromUpload] = useState({});
     const [agentName, setAgentName] = useState("");
     const [speed, setSpeed] = useState('');
+    const [finished, setFinished] = useState(false);
 
     const handleSpeedChange = (event) => {
         setSpeed(event.target.value);
@@ -123,6 +124,14 @@ const Waveform = () => {
         waveSurfer.on("region-updated", function (region) {
             setStartTime((region.start)?.toFixed(4));
             setEndTime((region.end)?.toFixed(4))
+        })
+
+        waveSurfer.on("finish", ()=>{
+            setFinished(true)
+        })
+
+        waveSurfer.on("play", ()=>{
+            setFinished(false)
         })
 
         return () => {
@@ -249,9 +258,9 @@ const Waveform = () => {
                             width: "200px",
                             fontSize: "14px"
                         }}
-                        startIcon={isPlaying ? <PauseIcon /> : < PlayArrowIcon />}
+                        startIcon={isPlaying && !finished ? <PauseIcon /> : < PlayArrowIcon />}
                     >
-                        {isPlaying ? "Pause Full Audio" : "Play Full Audio"}
+                        {isPlaying && !finished ? "Pause Full Audio" : "Play Full Audio"}
                     </Button>
 
                     <FormControl
